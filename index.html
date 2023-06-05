@@ -1,0 +1,87 @@
+<!DOCTYPE HTML>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <script src="https://unpkg.com/leaflet@1.7.1/dist/leaflet.js"></script>
+    <link rel="stylesheet" href="https://unpkg.com/leaflet@1.7.1/dist/leaflet.css" />
+    <style>
+      html, body {
+        height: 100%;
+        padding: 0;
+        margin: 0;
+      }
+      #map {
+        /* configure the size of the map */
+        width: 100%;
+        height: 100%;
+      }
+    </style>
+  </head>
+  <body>
+    <div id="map"></div>
+    <script src="https://d3js.org/d3.v5.min.js"></script>
+    <script>
+
+      // get data from usgs using d3
+        var eqs = d3.json("https://earthquake.usgs.gov/earthquakes/feed/v1.0/summary/4.5_week.geojson", function (data) {
+        });
+    </script>
+    <script>
+      // initialize Leaflet
+      var map = L.map('map').setView({lon: 139.65, lat: 35.68}, 5);
+
+      // add the OpenStreetMap tiles
+      L.tileLayer('https://tile.openstreetmap.org/{z}/{x}/{y}.png', {
+        maxZoom: 19,
+        attribution: '&copy; <a href="https://openstreetmap.org/copyright">OpenStreetMap contributors</a>'
+      }).addTo(map);
+
+      // show the scale bar on the lower left corner
+      L.control.scale({imperial: true, metric: true}).addTo(map);
+
+
+      // basic function to get color based on the email 
+      function getColor(d) {
+      return d > 90 ? '#800026' :
+           d > 70  ? '#BD0026' :
+           d > 50  ? '#E31A1C' :
+           d > 30  ? '#FC4E2A' :
+           d > 10   ? '#FD8D3C' :
+                      '#FFEDA0';
+      }
+
+
+      // THIS IS USING from previous script area, i made eqs_accepted a global variable
+      eqs_accepted = eqs.then((value) => { 
+
+        // this helps you parse the json with dev tools (f12 when you open webpage, prints all the stuff we're working with to console)
+        console.log(value)
+        
+        // looping through all the features to find what they're about
+        for (i = 0; i < value.features.length; i++) {
+
+          // getting all teh coords
+          coordinates = value.features[i].geometry.coordinates
+          // this is the magnitude
+          mag = value.features[i].properties.mag
+          
+          // this is how i was scaling color, the z value is the depth
+          scaled_color = getColor(coordinates[2])
+          scaled_size = mag
+          
+          // Used marker to start off cuz it was visible
+          L.marker([coordinates[1],coordinates[0]]).addTo(map);
+
+          // below is how to make the circles but i couldn't figure out the RADIUS portion of it
+          // L.circle([coordinates[1],coordinates[0]], {color: scaled_color, radius: scaled_size}).addTo(map)
+       
+          // Still need to add associated pop up to each thing, i think this is in the circle function options
+          
+        
+        }
+      });
+        // Still need to add Legend
+    </script>
+  </body>
+</html>
